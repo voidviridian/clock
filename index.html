@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>clock</title>
+    <style>
+      :root {
+        font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+        line-height: 0.9;
+
+        color-scheme: light dark;
+        color: rgba(255, 255, 255, 0.87);
+        background-color: #000000;
+
+        font-synthesis: none;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        -webkit-text-size-adjust: 100%;
+
+        overflow: hidden;
+      }
+
+      body {
+        margin: 0;
+        display: flex;
+        place-items: center;
+        min-width: 320px;
+        min-height: 100vh;
+      }
+
+      #app {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        text-align: center;
+        overflow: hidden;
+        display: flex;
+      }
+
+      #clock {
+        font-size: 35vh;
+        display: flex;
+        width: 100%;
+      }
+
+      .clock.seconds.odd {
+        visibility: hidden;
+      }
+
+      @media (prefers-color-scheme: light) {
+        :root {
+          color: #121c25;
+          background-color: #ffffff;
+        }
+      }
+
+      @media (orientation: portrait) {
+        #clock {
+          font-size: 50vh;
+          flex-direction: column;
+        } 
+        .clock.seconds {
+          display: none;
+        }
+      }
+
+      @media (orientation: landscape) {
+        #clock {
+          font-size: 60vh;
+          flex-direction: row;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <div id="clock"></div>
+    </div>
+    <script>
+      let lastMinute = -1;
+      let lastSeconds = -1;
+
+      const format = (value) => value.length === 1 ? `0${value}` : value;
+
+      document.addEventListener('DOMContentLoaded', () => {
+        const clock = document.querySelector('#clock');
+
+        setInterval(() => {
+          const { innerWidth: width, innerHeight: height } = window;
+          const orientation = width > height ? 'landscape' : 'portrait';
+          clock.classList.remove(['landscape', 'portrait']);
+          clock.classList.add(orientation);
+
+          const now = new Date();
+          const hours = format(now.getHours().toString());
+          const minutes = format(now.getMinutes().toString());
+          const seconds = format(now.getSeconds().toString());
+
+          const needChange = (orientation === 'portrait' && lastMinute !== minutes) || (orientation === 'landscape' && lastSeconds !== seconds);
+
+          if (needChange) {
+            lastMinute = minutes;
+            lastSeconds = seconds;
+            
+            const dateTime = [
+              `<div class="clock hours">${hours}</div>`,
+              `<div class="clock seconds ${seconds % 2 === 0 ? 'even' : 'odd'}">:</div>`,
+              `<div class="clock minutes">${minutes}</div>`,
+            ].join('');
+            clock.innerHTML = dateTime;
+          }
+          
+        }, 1000);
+      });
+    </script>
+  </body>
+</html>
